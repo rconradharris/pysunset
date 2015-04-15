@@ -29,7 +29,7 @@ def _get_sunset_or_sunrise(mode, date, latitude, longitude, utc_offset,
             datetime.timedelta(hours=local_time_hours))
 
 
-def get_sunrise(date, latitude, longitude, utc_offset=0, zenith='official'):
+def get_sunrise(date, latitude, longitude, utc_offset, zenith='official'):
     """Returns sunrise as a `datetime` or `None` if there is no sunrise for
     this location on the given date.
 
@@ -44,7 +44,7 @@ def get_sunrise(date, latitude, longitude, utc_offset=0, zenith='official'):
                                   utc_offset, zenith)
 
 
-def get_sunset(date, latitude, longitude, utc_offset=0, zenith='official'):
+def get_sunset(date, latitude, longitude, utc_offset, zenith='official'):
     """Returns sunset as a `datetime` or `None` if there is no sunset for this
     location on the given date.
 
