@@ -1,9 +1,9 @@
 """
 Trigonometic Functions
 
-The algorithm is expresses angular units in degrees so we wrap the
-standard library functions to do the necessary conversions from degrees to
-radians and back.
+The algorithm expresses angular units in degrees so we wrap the standard
+library functions to do the necessary conversions from degrees to radians and
+back.
 """
 from math import sin, cos, tan, asin, acos, atan, degrees, radians
 

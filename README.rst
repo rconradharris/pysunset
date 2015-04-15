@@ -12,9 +12,10 @@ Example
 =======
 
 ::
+
     >>> import datetime, sunset
     >>> today = datetime.date.today()
     >>> lat, lng = 30.3, -96.27  # Austin, TX
     >>> utc_offset = -5 # CDT
-    >>> sunset.get_sunset(today, lat, lng, -5)
+    >>> sunset.get_sunset(today, lat, lng, utc_offset)
     datetime.datetime(2015, 4, 15, 19, 52, 33)

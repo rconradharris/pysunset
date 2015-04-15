@@ -1,13 +1,15 @@
 """
 Algorithm for computing sunrise and sunset.
 
-This file written in a literate style where the design document[1] is embedded
-directly in the code as docstrings. Moreover, the code is pulled from the
-design document as well where possible.
+This file written in a literate style[1] where the design document[2] is
+embedded directly in the code as docstrings.
 
-[1] http://williams.best.vwh.net/sunrise_sunset_algorithm.htm
+---
+
+[1] http://en.wikipedia.org/wiki/Literate_programming
+
+[2] http://williams.best.vwh.net/sunrise_sunset_algorithm.htm
 """
-
 from __future__ import division
 from __future__ import print_function
 
@@ -26,6 +28,7 @@ class NoSunrise(Exception):
 
 class NoSunset(Exception):
     pass
+
 
 """
 Sunrise/Sunset Algorithm
