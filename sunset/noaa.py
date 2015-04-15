@@ -457,5 +457,19 @@ if __name__ == "__main__":
     longitude = DMS_to_decimal(-97, -43, -59)
     utc_offset = -5  # CDT
 
-    print get_sunrise(today, latitude, longitude, utc_offset).strftime("%I:%M:%S")
-    print get_sunset(today, latitude, longitude, utc_offset).strftime("%I:%M:%S")
+    print(' '.join([
+        'Algorithm'.ljust(20),
+        'Sunrise'.ljust(20),
+        'Sunset'
+    ]))
+
+    print("=" * 53)
+
+    sunrise = get_sunrise(today, latitude, longitude, utc_offset)
+    sunset = get_sunset(today, latitude, longitude, utc_offset)
+
+    print(' '.join([
+        "noaa".ljust(20),
+        sunrise.strftime("%I:%M:%S %p").ljust(20),
+        sunset.strftime("%I:%M:%S %p")
+    ]))

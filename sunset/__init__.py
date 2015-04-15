@@ -16,8 +16,8 @@ def get_sunrise(date, latitude, longitude, utc_offset, algorithm="afc1990", **kw
     this location on the given date.
 
     date: `datetime.date` object representing the desired date
-    latitude: latitude in decimal degrees
-    longitude: longitude in decimal degrees
+    latitude: latitude in decimal degrees (N is positive)
+    longitude: longitude in decimal degrees (E is positive)
     utc_offset: offset from UTC in hours (e.g. -5 is CDT)
     algorithm: which algorithm to use
     """
@@ -31,8 +31,8 @@ def get_sunset(date, latitude, longitude, utc_offset, algorithm="afc1990", **kwa
     location on the given date.
 
     date: `datetime.date` object representing the desired date
-    latitude: latitidue in decimal degrees
-    longitude: longitude in decimal degrees
+    latitude: latitude in decimal degrees (N is positive)
+    longitude: longitude in decimal degrees (E is positive)
     utc_offset: offset from UTC in hours (e.g. -5 is CDT)
     algorithm: which algorithm to use
     """
@@ -49,6 +49,11 @@ if __name__ == "__main__":
     longitude = DMS_to_decimal(-97, -43, -59)
     utc_offset = -5  # CDT
 
+    print(' '.join([
+        'Algorithm'.ljust(20),
+        'Sunrise'.ljust(20),
+        'Sunset'
+    ]))
 
     print("=" * 53)
 
