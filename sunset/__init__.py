@@ -1,35 +1,17 @@
-"""
-Higher-level API for accessing sunrise and sunset.
-
-These APIs provide a Pythonic wrapper around the sunrise and sunset
-calculation algorithm.
-
-Datetime objects are used for time.
-"""
-
 import datetime
 
-import algorithm
+import afc1990
+import noaa
 from utils import DMS_to_decimal
 
 
-def _get_sunset_or_sunrise(mode, date, latitude, longitude, utc_offset,
-                           zenith):
-    day = date.day
-    month = date.month
-    year = date.year
-
-    try:
-        local_time_hours = algorithm.get_sunset_or_sunrise(
-            mode, day, month, year, latitude, longitude, utc_offset, zenith)
-    except (algorithm.NoSunrise, algorithm.NoSunset):
-        return None
-
-    return (datetime.datetime(year, month, day) +
-            datetime.timedelta(hours=local_time_hours))
+ALGORITHMS = {
+    "afc1990": afc1990,
+    "noaa": noaa
+}
 
 
-def get_sunrise(date, latitude, longitude, utc_offset, zenith='official'):
+def get_sunrise(date, latitude, longitude, utc_offset, algorithm="afc1990", **kwargs):
     """Returns sunrise as a `datetime` or `None` if there is no sunrise for
     this location on the given date.
 
@@ -37,14 +19,14 @@ def get_sunrise(date, latitude, longitude, utc_offset, zenith='official'):
     latitude: latitude in decimal degrees
     longitude: longitude in decimal degrees
     utc_offset: offset from UTC in hours (e.g. -5 is CDT)
-    zenith: standard definition of sunrise ('official, 'civil', 'nautical',
-            'astronomical')
+    algorithm: which algorithm to use
     """
-    return _get_sunset_or_sunrise('rising', date, latitude, longitude,
-                                  utc_offset, zenith)
+    _get_sunrise = ALGORITHMS[algorithm].get_sunrise
+
+    return _get_sunrise(date, latitude, longitude, utc_offset, **kwargs)
 
 
-def get_sunset(date, latitude, longitude, utc_offset, zenith='official'):
+def get_sunset(date, latitude, longitude, utc_offset, algorithm="afc1990", **kwargs):
     """Returns sunset as a `datetime` or `None` if there is no sunset for this
     location on the given date.
 
@@ -52,37 +34,33 @@ def get_sunset(date, latitude, longitude, utc_offset, zenith='official'):
     latitude: latitidue in decimal degrees
     longitude: longitude in decimal degrees
     utc_offset: offset from UTC in hours (e.g. -5 is CDT)
-    zenith: standard definition of sunset ('official, 'civil', 'nautical',
-            'astronomical')
+    algorithm: which algorithm to use
     """
-    return _get_sunset_or_sunrise('setting', date, latitude, longitude,
-                                  utc_offset, zenith)
+    _get_sunset = ALGORITHMS[algorithm].get_sunset
+
+    return _get_sunset(date, latitude, longitude, utc_offset, **kwargs)
 
 
 if __name__ == "__main__":
     today = datetime.date.today()
 
     # Position (Austin, TX)
-    latitude = DMS_to_decimal(30, 18, 0)
-    longitude = DMS_to_decimal(-97, 44, 0)
+    latitude = DMS_to_decimal(30, 16, 59)
+    longitude = DMS_to_decimal(-97, -43, -59)
+    utc_offset = -5  # CDT
 
-    # UTC offset (CDT)
-    utc_offset = -5
-
-    print(' '.join([
-        'Zenith Name'.ljust(20),
-        'Sunrise'.ljust(20),
-        'Sunset'
-    ]))
 
     print("=" * 53)
 
-    for zenith in ('official', 'civil', 'nautical', 'astronomical'):
-        sunset = get_sunset(today, latitude, longitude, utc_offset, zenith)
-        sunrise = get_sunrise(today, latitude, longitude, utc_offset, zenith)
+    for algorithm in ('afc1990', 'noaa'):
+        sunset = get_sunset(today, latitude, longitude, utc_offset,
+                            algorithm=algorithm)
+
+        sunrise = get_sunrise(today, latitude, longitude, utc_offset,
+                              algorithm=algorithm)
 
         print(' '.join([
-            zenith.ljust(20),
+            algorithm.ljust(20),
             sunrise.strftime("%I:%M:%S %p").ljust(20),
             sunset.strftime("%I:%M:%S %p")
         ]))

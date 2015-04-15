@@ -1,18 +1,15 @@
 """
-Algorithm for computing sunrise and sunset.
+Algorithm for computing sunrise and sunset
 
 This file written in a literate style[1] where the design document[2] is
 embedded directly in the code as docstrings.
 
----
-
-[1] http://en.wikipedia.org/wiki/Literate_programming
-
-[2] http://williams.best.vwh.net/sunrise_sunset_algorithm.htm
+Source: http://williams.best.vwh.net/sunrise_sunset_algorithm.htm
 """
 from __future__ import division
 from __future__ import print_function
 
+import datetime
 from math import floor
 
 from trig import sin, cos, tan, asin, acos, atan
@@ -66,7 +63,7 @@ ZENITHS = {
         = (180/pi)*atan(0.91764 * tan((pi/180)*L)) to give a degree
         answer with a degree input for L.
 """
-def get_day_of_year_step_1(day, month, year):
+def _get_day_of_year_step_1(day, month, year):
     """
     1. first calculate the day of the year
 
@@ -82,7 +79,7 @@ def get_day_of_year_step_1(day, month, year):
     return N  # days
 
 
-def get_rising_or_setting_time_step_2(N, longitude, mode):
+def _get_rising_or_setting_time_step_2(N, longitude, mode):
     """
     2. convert the longitude to hour value and calculate an approximate time
 
@@ -105,7 +102,7 @@ def get_rising_or_setting_time_step_2(N, longitude, mode):
     return t  # days
 
 
-def get_suns_mean_anomaly_step_3(t):
+def _get_suns_mean_anomaly_step_3(t):
     """
     3. calculate the Sun's mean anomaly
 
@@ -115,7 +112,7 @@ def get_suns_mean_anomaly_step_3(t):
     return M  # degrees
 
 
-def get_suns_true_longitude_step_4(M):
+def _get_suns_true_longitude_step_4(M):
     """
     4. calculate the Sun's true longitude
 
@@ -126,7 +123,7 @@ def get_suns_true_longitude_step_4(M):
     return L % 360  # degrees
 
 
-def get_suns_right_ascension_step_5a(L):
+def _get_suns_right_ascension_step_5a(L):
     """
     5a. calculate the Sun's right ascension
 
@@ -137,7 +134,7 @@ def get_suns_right_ascension_step_5a(L):
     return RA % 360  # degrees
 
 
-def get_suns_right_ascension_step_5b(L, RA):
+def _get_suns_right_ascension_step_5b(L, RA):
     """
     5b. right ascension value needs to be in the same quadrant as L
 
@@ -151,7 +148,7 @@ def get_suns_right_ascension_step_5b(L, RA):
     return RA  # degrees
 
 
-def get_suns_right_ascension_step_5c(RA):
+def _get_suns_right_ascension_step_5c(RA):
     """
     5c. right ascension value needs to be converted into hours
 
@@ -161,7 +158,7 @@ def get_suns_right_ascension_step_5c(RA):
     return RA  # hours
 
 
-def get_suns_declination_sin_and_cos_step_6(L):
+def _get_suns_declination_sin_and_cos_step_6(L):
     """
     6. calculate the Sun's declination
 
@@ -173,7 +170,7 @@ def get_suns_declination_sin_and_cos_step_6(L):
     return sinDec, cosDec  # scalars
 
 
-def get_suns_local_hour_angle_step_7a(zenith, latitude, sinDec, cosDec):
+def _get_suns_local_hour_angle_step_7a(zenith, latitude, sinDec, cosDec):
     """
     7a. calculate the Sun's local hour angle
 
@@ -194,7 +191,7 @@ def get_suns_local_hour_angle_step_7a(zenith, latitude, sinDec, cosDec):
     return cosH  # scalar
 
 
-def get_suns_local_hour_angle_step_7b(cosH, mode):
+def _get_suns_local_hour_angle_step_7b(cosH, mode):
     """
     7b. finish calculating H and convert into hours
 
@@ -216,7 +213,7 @@ def get_suns_local_hour_angle_step_7b(cosH, mode):
     return H  # hours
 
 
-def get_local_mean_time_rising_or_setting_step_8(H, RA, t):
+def _get_local_mean_time_rising_or_setting_step_8(H, RA, t):
     """
     8. calculate local mean time of rising/setting
 
@@ -226,7 +223,7 @@ def get_local_mean_time_rising_or_setting_step_8(H, RA, t):
     return T  # hours
 
 
-def get_local_mean_time_rising_or_setting_as_UTC_step_9(T, longitude):
+def _get_local_mean_time_rising_or_setting_as_UTC_step_9(T, longitude):
     """
     9. adjust back to UTC
 
@@ -239,7 +236,7 @@ def get_local_mean_time_rising_or_setting_as_UTC_step_9(T, longitude):
     return UT % 24  # hours
 
 
-def get_local_mean_time_rising_or_setting_as_local_time_step_10(UT, localOffset):
+def _get_local_mean_time_rising_or_setting_as_local_time_step_10(UT, localOffset):
     """
     10. convert UT value to local time zone of latitude/longitude
 
@@ -262,48 +259,131 @@ def log_step(step, description, var, val):
                        '(step {0})'.format(step)]))
 
 
-def get_sunset_or_sunrise(mode, day, month, year, latitude, longitude,
+def _get_sunset_or_sunrise(mode, day, month, year, latitude, longitude,
                           localOffset, zenith):
     zenith = ZENITHS[zenith]
 
-    N = get_day_of_year_step_1(day, month, year)
+    N = _get_day_of_year_step_1(day, month, year)
     log_step('1', 'Day of year', 'N', N)
 
-    t = get_rising_or_setting_time_step_2(N, longitude, mode)
+    t = _get_rising_or_setting_time_step_2(N, longitude, mode)
     log_step('2', "Rising or setting time", 't', t)
 
-    M = get_suns_mean_anomaly_step_3(t)
+    M = _get_suns_mean_anomaly_step_3(t)
     log_step('3', "Sun's mean anomaly", 'M', M)
 
-    L = get_suns_true_longitude_step_4(M)
+    L = _get_suns_true_longitude_step_4(M)
     log_step('4', "Sun's true longitude", 'L', L)
 
-    RA = get_suns_right_ascension_step_5a(L)
+    RA = _get_suns_right_ascension_step_5a(L)
     log_step('5a', "Sun's right ascension", 'RA', RA)
 
-    RA = get_suns_right_ascension_step_5b(L, RA)
+    RA = _get_suns_right_ascension_step_5b(L, RA)
     log_step('5b', "Sun's right ascension", 'RA', RA)
 
-    RA = get_suns_right_ascension_step_5c(RA)
+    RA = _get_suns_right_ascension_step_5c(RA)
     log_step('5c', "Sun's right ascension", 'RA', RA)
 
-    sinDec, cosDec = get_suns_declination_sin_and_cos_step_6(L)
+    sinDec, cosDec = _get_suns_declination_sin_and_cos_step_6(L)
     log_step('6', "Sin of sun's declination", 'sinDec', sinDec)
     log_step('6', "Cos of sun's declination", 'cosDec', cosDec)
 
-    cosH = get_suns_local_hour_angle_step_7a(zenith, latitude, sinDec, cosDec)
+    cosH = _get_suns_local_hour_angle_step_7a(zenith, latitude, sinDec, cosDec)
     log_step('7a', "Sun's local hour angle", 'cosH', cosH)
 
-    H = get_suns_local_hour_angle_step_7b(cosH, mode)
+    H = _get_suns_local_hour_angle_step_7b(cosH, mode)
     log_step('7b', "Sun's local hour angle", 'H', H)
 
-    T = get_local_mean_time_rising_or_setting_step_8(H, RA, t)
+    T = _get_local_mean_time_rising_or_setting_step_8(H, RA, t)
     log_step('8', "Sun's local mean time rising or setting", 'T', T)
 
-    UT = get_local_mean_time_rising_or_setting_as_UTC_step_9(T, longitude)
+    UT = _get_local_mean_time_rising_or_setting_as_UTC_step_9(T, longitude)
     log_step('9', "Sun's local mean time rising or setting in UTC", 'UT', UT)
 
-    localT = get_local_mean_time_rising_or_setting_as_local_time_step_10(UT, localOffset)
+    localT = _get_local_mean_time_rising_or_setting_as_local_time_step_10(UT, localOffset)
     log_step('10', "Sun's local mean time rising or setting in local time", 'localT', localT)
 
     return localT
+
+
+def _get_sunset_or_sunrise_datetime(mode, date, latitude, longitude, utc_offset,
+                           zenith):
+    day = date.day
+    month = date.month
+    year = date.year
+
+    try:
+        local_time_hours = _get_sunset_or_sunrise(
+            mode, day, month, year, latitude, longitude, utc_offset, zenith)
+    except (NoSunrise, NoSunset):
+        return None
+
+    return (datetime.datetime(year, month, day) +
+            datetime.timedelta(hours=local_time_hours))
+
+
+# Public functions
+
+def get_sunrise(date, latitude, longitude, utc_offset, zenith='official',
+                **kwargs):
+    """Returns sunrise as a `datetime` or `None` if there is no sunrise for
+    this location on the given date.
+
+    date: `datetime.date` object representing the desired date
+    latitude: latitude in decimal degrees
+    longitude: longitude in decimal degrees
+    utc_offset: offset from UTC in hours (e.g. -5 is CDT)
+    zenith: standard definition of sunrise ('official, 'civil', 'nautical',
+            'astronomical')
+    """
+    return _get_sunset_or_sunrise_datetime(
+            'rising', date, latitude, longitude, utc_offset, zenith)
+
+
+def get_sunset(date, latitude, longitude, utc_offset, zenith='official',
+               **kwargs):
+    """Returns sunset as a `datetime` or `None` if there is no sunset for this
+    location on the given date.
+
+    date: `datetime.date` object representing the desired date
+    latitude: latitidue in decimal degrees
+    longitude: longitude in decimal degrees
+    utc_offset: offset from UTC in hours (e.g. -5 is CDT)
+    zenith: standard definition of sunset ('official, 'civil', 'nautical',
+            'astronomical')
+    """
+    return _get_sunset_or_sunrise_datetime(
+            'setting', date, latitude, longitude, utc_offset, zenith)
+
+
+
+if __name__ == "__main__":
+    today = datetime.date.today()
+
+    # Position (Austin, TX)
+    latitude = DMS_to_decimal(30, 16, 59)
+    longitude = DMS_to_decimal(-97, -43, -59)
+
+    # UTC offset (CDT)
+    utc_offset = -5
+
+    print(' '.join([
+        'Zenith Name'.ljust(20),
+        'Sunrise'.ljust(20),
+        'Sunset'
+    ]))
+
+    print("=" * 53)
+
+    for zenith in ('official', 'civil', 'nautical', 'astronomical'):
+        sunset = get_sunset(today, latitude, longitude, utc_offset,
+                            zenith=zenith)
+
+        sunrise = get_sunrise(today, latitude, longitude, utc_offset,
+                              zenith=zenith)
+
+        print(' '.join([
+            zenith.ljust(20),
+            sunrise.strftime("%I:%M:%S %p").ljust(20),
+            sunset.strftime("%I:%M:%S %p")
+        ]))
